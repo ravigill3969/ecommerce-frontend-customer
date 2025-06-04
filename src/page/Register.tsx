@@ -1,16 +1,17 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
-import { useLogin } from "../api/user";
+import { useRegister } from "../api/user";
 
 type LoginFormInputs = {
   email: string;
   password: string;
+  name: string;
 };
 
 const Login: React.FC = () => {
   const [showPassword, setShowPassword] = React.useState(false);
-  const { mutate } = useLogin();
+  const { mutate } = useRegister();
 
   const {
     register,
@@ -55,6 +56,42 @@ const Login: React.FC = () => {
           {/* Form */}
           <div className="space-y-6">
             {/* Email Field */}
+            <div>
+              <label
+                htmlFor="name"
+                className="block text-sm font-semibold text-gray-200 mb-3"
+              >
+                Name
+              </label>
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Mail className="h-5 w-5 text-purple-400 group-focus-within:text-purple-300 transition-colors" />
+                </div>
+                <input
+                  id="name"
+                  type="name"
+                  className={`w-full pl-12 pr-4 py-4 bg-white/5 border border-white/20 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all duration-300 text-white placeholder-gray-400 backdrop-blur-sm hover:bg-white/10 ${
+                    errors.name
+                      ? "border-red-400 bg-red-500/10"
+                      : "border-white/20"
+                  }`}
+                  placeholder="Enter your name"
+                  {...register("name", {
+                    required: "Name is required",
+                   minLength: {
+                      value: 3,
+                      message: "Name is required",
+                    },
+                  })}
+                />
+              </div>
+              {errors.name && (
+                <p className="mt-3 text-sm text-red-400 font-medium">
+                  {errors.name.message}
+                </p>
+              )}
+            </div>
+            <div className="space-y-6"></div>
             <div>
               <label
                 htmlFor="email"
