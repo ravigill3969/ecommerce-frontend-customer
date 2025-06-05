@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useLogin } from "../api/user";
+import { useUser } from "@/context/UserContext";
+import { useNavigate } from "react-router";
 
 type LoginFormInputs = {
   email: string;
@@ -11,6 +13,7 @@ type LoginFormInputs = {
 const Login: React.FC = () => {
   const [showPassword, setShowPassword] = React.useState(false);
   const { mutate } = useLogin();
+  const navigate = useNavigate();
 
   const {
     register,
@@ -21,6 +24,14 @@ const Login: React.FC = () => {
   const onSubmit = async (data: LoginFormInputs) => {
     mutate(data);
   };
+
+  const { isAuthenticated } = useUser();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/");
+    }
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4 relative overflow-hidden">

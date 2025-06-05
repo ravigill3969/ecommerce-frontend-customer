@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
@@ -14,97 +13,58 @@ type UserContextT = {
   userId: string | null;
   isLoading: boolean;
   isAuthenticated: boolean;
-  refetch: () => void;
 };
 
 const UserContext = createContext<UserContextT | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [userId, setUserId] = useState<string | null>(null);
-  const [hasNavigated, setHasNavigated] = useState(false);
-  const navigate = useNavigate();
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
-  const { 
-    isError, 
-    isSuccess, 
-    isLoading, 
-    data, 
-    error,
-    refetch 
-  } = useQuery<VerifyUserResponse>({
-    queryKey: ["verifyUser"],
-    queryFn: async (): Promise<VerifyUserResponse> => {
-      const response = await fetch(`${baseurl}/auth/v1/verify-user`, {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+  const { isError, isSuccess, isLoading, data, error } =
+    useQuery<VerifyUserResponse>({
+      queryKey: ["verifyUser"],
+      queryFn: async (): Promise<VerifyUserResponse> => {
+        const response = await fetch(`${baseurl}/auth/v1/verify-user`, {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
 
-      const res = await response.json();
+        const res = await response.json();
 
-      if (!response.ok) {
-        throw new Error(res.message || "Authentication failed");
-      }
+        if (!response.ok) {
+          throw new Error(res.message || "Authentication failed");
+        }
 
-      return res;
-    },
-    retry: false,
-    refetchOnWindowFocus: false,
-    staleTime: 5 * 60 * 1000,
-  });
+        return res;
+      },
+      retry: false,
+      refetchOnWindowFocus: false,
+      staleTime: 5 * 60 * 1000,
+    });
 
-  // Handle successful authentication
   useEffect(() => {
     if (isSuccess && data?.userId) {
       setUserId(data.userId);
-      
-      // Only navigate to home if we're currently on login/register pages
-      // and haven't already navigated
-      const currentPath = window.location.pathname;
-      const authPages = ['/login', '/register', '/signup'];
-      
-      if (authPages.includes(currentPath) && !hasNavigated) {
-        navigate("/", { replace: true });
-        setHasNavigated(true);
-      }
+      setIsAuthenticated(true);
     }
-  }, [isSuccess, data, navigate, hasNavigated]);
+  }, [isSuccess, data]);
 
-  // Handle authentication errors
   useEffect(() => {
     if (isError) {
       setUserId(null);
-      
-      // Only show error toast and navigate if we're not already on auth pages
-      const currentPath = window.location.pathname;
-      const authPages = ['/login', '/register', '/signup'];
-      
-      if (!authPages.includes(currentPath)) {
-        const errorMessage = error instanceof Error ? error.message : "Please login";
-        toast.error(errorMessage);
-        navigate("/login", { replace: true });
-      }
+      setIsAuthenticated(false);
+      const errorMessage =
+        error instanceof Error ? error.message : "Please login";
+      toast.error(errorMessage);
     }
-  }, [isError, error, navigate]);
-
-  // Reset hasNavigated when query state changes
-  useEffect(() => {
-    if (isLoading) {
-      setHasNavigated(false);
-    }
-  }, [isLoading]);
-
-  const contextValue: UserContextT = {
-    userId,
-    isLoading,
-    isAuthenticated: !!userId && !isError,
-    refetch,
-  };
+  }, [isError, error]);
 
   return (
-    <UserContext.Provider value={contextValue}>
+    <UserContext.Provider value={{ isAuthenticated, isLoading, userId }}>
       {children}
     </UserContext.Provider>
   );
@@ -112,7 +72,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
 export const useUser = (): UserContextT => {
   const context = useContext(UserContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error("useUser must be used within a UserProvider");
   }
   return context;

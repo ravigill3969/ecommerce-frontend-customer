@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router";
 
 const baseurl = import.meta.env.VITE_BASE_URL;
 
@@ -18,6 +19,7 @@ type LoginErrT = {
 };
 
 export function useLogin() {
+  const navigate = useNavigate();
   const query = useQueryClient();
   const login = async (data: LoginT): Promise<LoginResT> => {
     const response = await fetch(`${baseurl}/auth/v1/login`, {
@@ -47,6 +49,7 @@ export function useLogin() {
     onSuccess: (data) => {
       toast.success(data.message);
       query.invalidateQueries({ queryKey: ["verifyUser"] });
+      navigate("/");
     },
     onError: (error) => {
       toast.error(error.message);
@@ -74,6 +77,7 @@ type RegisterErrResT = {
 
 export function useRegister() {
   const query = useQueryClient();
+  const navigate = useNavigate();
 
   const register = async (data: RegisterT): Promise<RegisterSuccResT> => {
     const response = await fetch(`${baseurl}/auth/v1/register`, {
@@ -103,6 +107,7 @@ export function useRegister() {
     onSuccess: (data) => {
       toast.success(data.message);
       query.invalidateQueries({ queryKey: ["verifyUser"] });
+      navigate("/");
     },
     onError: (error) => {
       toast.error(error.message);
