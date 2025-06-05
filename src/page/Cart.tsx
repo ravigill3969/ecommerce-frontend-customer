@@ -8,12 +8,11 @@ import {
   Shield,
   Truck,
 } from "lucide-react";
-import { useGetUserCart } from "@/api/cart";
 import EcommerceNavbar from "@/components/Nav2";
 import { useSocketForCart } from "@/context/SocketContext";
 
 function Cart() {
-  const { data } = useGetUserCart();
+  const { res } = useSocketForCart();
 
   const { decrementInCart, incrementInCart } = useSocketForCart();
 
@@ -26,16 +25,16 @@ function Cart() {
   };
 
   const incrementProduct = (productId: string) => {
-    console.log(productId)
+    console.log(productId);
     incrementInCart(productId);
   };
 
   const decrementProduct = (productId: string) => {
-    console.log(productId)
+    console.log(productId);
     decrementInCart(productId);
   };
 
-  if (!data || !data.success) {
+  if (!res || !res.success) {
     return (
       <>
         <EcommerceNavbar />
@@ -59,7 +58,7 @@ function Cart() {
     );
   }
 
-  const { cart, products } = data;
+  const { cart, products } = res;
 
   if (!cart.items || cart.items.length === 0) {
     return (

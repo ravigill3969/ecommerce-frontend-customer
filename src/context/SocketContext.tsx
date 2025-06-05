@@ -4,9 +4,11 @@ import React, {
   useContext,
   useEffect,
   useCallback,
+  useState,
 } from "react";
 import { io, Socket } from "socket.io-client";
 import { useUser } from "./UserContext";
+import { useGetUserCart, type GetCartAPIResponse } from "@/api/cart";
 
 const baseurl = import.meta.env.VITE_BASE_URL;
 const socket: Socket = io(baseurl);
@@ -14,25 +16,88 @@ const socket: Socket = io(baseurl);
 type SocketContextT = {
   incrementInCart: (productId: string) => void;
   decrementInCart: (productId: string) => void;
+  res: GetCartAPIResponse | null;
 };
 
 const SocketContext = createContext<SocketContextT | undefined>(undefined);
 
 export function SocketProvider({ children }: { children: React.ReactNode }) {
   const { userId } = useUser();
-  useEffect(() => {
-    socket.on("connection", (message: string) => {
-      console.log("Cart updated:", message);
+
+  const [res, setRes] = useState<GetCartAPIResponse | null>(null);
+
+  function increment(productId: string) {
+    setRes((prev) => {
+      if (!prev) return prev;
+
+      const updatedItems = prev.cart.items.map((item) => {
+        if (item.productId === productId) {
+          return {
+            ...item,
+            quantity: item.quantity + 1,
+          };
+        }
+        return item;
+      });
+
+      return {
+        ...prev,
+        cart: {
+          ...prev.cart,
+          items: updatedItems,
+        },
+      };
     });
+  }
+
+  function decrement(productId: string) {
+    setRes((prev) => {
+      if (!prev) return prev;
+
+      const updatedItems = prev.cart.items
+        .map((item) => {
+          if (item.productId === productId) {
+            const newQuantity = item.quantity - 1;
+            if (newQuantity <= 0) return null;
+            return {
+              ...item,
+              quantity: newQuantity,
+            };
+          }
+          return item;
+        })
+        .filter(
+          (item): item is (typeof prev.cart.items)[number] => item !== null
+        );
+
+      return {
+        ...prev,
+        cart: {
+          ...prev.cart,
+          items: updatedItems,
+        },
+      };
+    });
+  }
+
+  const { data } = useGetUserCart();
+
+  useEffect(() => {
+    if (data) {
+      setRes(data);
+    }
+
+    socket.on("connection", () => {});
 
     return () => {
       socket.off("cart-updated");
     };
-  }, []);
+  }, [data]);
 
   const incrementInCart = useCallback(
     (productId: string) => {
       socket.emit("cart-increment", { productId, userId });
+      increment(productId);
     },
     [userId]
   );
@@ -40,12 +105,13 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
   const decrementInCart = useCallback(
     (productId: string) => {
       socket.emit("cart-decrement", { productId, userId });
+      decrement(productId);
     },
     [userId]
   );
 
   return (
-    <SocketContext.Provider value={{ incrementInCart, decrementInCart }}>
+    <SocketContext.Provider value={{ incrementInCart, decrementInCart, res }}>
       {children}
     </SocketContext.Provider>
   );
