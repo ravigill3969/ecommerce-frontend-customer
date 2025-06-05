@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 const baseurl = import.meta.env.VITE_BASE_URL;
@@ -19,6 +19,7 @@ type AddItemToCartOrCreateCartErrorRes = {
 };
 
 export const useAddItemToCartOrCreateCart = () => {
+  const query = useQueryClient();
   const addItemToCartOrCreateCart = async (
     data: AddItemToCartOrCreateCartAsInput
   ): Promise<AddItemToCartOrCreateCartSuccessRes> => {
@@ -50,6 +51,7 @@ export const useAddItemToCartOrCreateCart = () => {
     mutationFn: addItemToCartOrCreateCart,
     onSuccess(data) {
       toast.success(data.message);
+      query.invalidateQueries({ queryKey: ["getUserCart"] });
     },
     onError(error) {
       toast.error(error.message);

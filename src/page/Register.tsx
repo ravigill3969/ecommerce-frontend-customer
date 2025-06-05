@@ -45,7 +45,7 @@ const Login: React.FC = () => {
             <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg transform hover:scale-110 transition-transform duration-300">
               <Lock className="w-8 h-8 text-white drop-shadow-sm" />
             </div>
-            <h2 className="text-3xl font-bold text-white mb-2 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+            <h2 className="text-3xl font-bold  mb-2 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
               Welcome back
             </h2>
             <p className="text-gray-300 mt-2 text-lg">

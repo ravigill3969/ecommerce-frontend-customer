@@ -87,17 +87,26 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
       setRes(data);
     }
 
-    socket.on("connection", () => {});
+    const handleIncrement = (data: { productId: string }) => {
+      increment(data.productId);
+    };
+
+    const handleDecrement = (data: { productId: string }) => {
+      decrement(data.productId);
+    };
+
+    socket.on("cart-updated-increment", handleIncrement);
+    socket.on("cart-updated-decrement", handleDecrement);
 
     return () => {
-      socket.off("cart-updated");
+      socket.off("cart-updated-increment", handleIncrement);
+      socket.off("cart-updated-decrement", handleDecrement);
     };
   }, [data]);
 
   const incrementInCart = useCallback(
     (productId: string) => {
       socket.emit("cart-increment", { productId, userId });
-      increment(productId);
     },
     [userId]
   );
@@ -105,7 +114,6 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
   const decrementInCart = useCallback(
     (productId: string) => {
       socket.emit("cart-decrement", { productId, userId });
-      decrement(productId);
     },
     [userId]
   );
