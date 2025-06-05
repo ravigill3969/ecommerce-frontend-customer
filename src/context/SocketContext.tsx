@@ -9,6 +9,7 @@ import React, {
 import { io, Socket } from "socket.io-client";
 import { useUser } from "./UserContext";
 import { useGetUserCart, type GetCartAPIResponse } from "@/api/cart";
+import toast from "react-hot-toast";
 
 const baseurl = import.meta.env.VITE_BASE_URL;
 const socket: Socket = io(baseurl);
@@ -87,12 +88,30 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
       setRes(data);
     }
 
-    const handleIncrement = (data: { productId: string }) => {
-      increment(data.productId);
+    const handleIncrement = (data: {
+      productId: string;
+      success: boolean;
+      message: string;
+    }) => {
+      if (data.success) {
+        increment(data.productId);
+        toast.success(data.message);
+      } else {
+        toast.error(data.message);
+      }
     };
 
-    const handleDecrement = (data: { productId: string }) => {
-      decrement(data.productId);
+    const handleDecrement = (data: {
+      productId: string;
+      success: boolean;
+      message: string;
+    }) => {
+      if (data.success) {
+        decrement(data.productId);
+        toast.success(data.message);
+      } else {
+        toast.error(data.message);
+      }
     };
 
     socket.on("cart-updated-increment", handleIncrement);
