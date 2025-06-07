@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router";
 
@@ -13,7 +13,7 @@ type LoginResT = {
   message: string;
 };
 
-type LoginErrT = {
+type ErrorRes = {
   status: string;
   message: string;
 };
@@ -33,7 +33,7 @@ export function useLogin() {
     const res = await response.json();
 
     if (!response.ok) {
-      const err: LoginErrT = {
+      const err: ErrorRes = {
         status: res.status || "error",
         message: res.message || "Login failed",
       };
@@ -70,11 +70,6 @@ type RegisterSuccResT = {
   message: string;
 };
 
-type RegisterErrResT = {
-  status: string;
-  message: string;
-};
-
 export function useRegister() {
   const query = useQueryClient();
   const navigate = useNavigate();
@@ -91,7 +86,7 @@ export function useRegister() {
     const res = await response.json();
 
     if (!response.ok) {
-      const err: RegisterErrResT = {
+      const err: ErrorRes = {
         status: res.status || "error",
         message: res.message || "Login failed",
       };
@@ -116,3 +111,46 @@ export function useRegister() {
 
   return mutate;
 }
+
+export interface User {
+  _id: string;
+  name: string;
+  email: string;
+  prevOrders: string[]; // Adjust if it's not just IDs
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+}
+
+export interface VerifiedUserResponse {
+  message: string;
+  user: User;
+}
+
+export const useGetCurrentUser = () => {
+  const getCurrentUserInfo = async (): Promise<VerifiedUserResponse> => {
+    const response = await fetch(`${baseurl}/auth/v1/get-current-user`, {
+      method: "GET",
+      credentials: "include",
+    });
+
+    const res = await response.json();
+
+    if (!response.ok) {
+      const err: ErrorRes = {
+        message: res.message,
+        status: res.status,
+      };
+      throw err;
+    }
+    console.log(res.message);
+    return res;
+  };
+
+  const query = useQuery({
+    queryKey: ["getCurrentUserInfo"],
+    queryFn: getCurrentUserInfo,
+  });
+
+  return query;
+};
