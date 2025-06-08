@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import EcommerceNavbar from "@/components/Nav2";
 import { useSocketForCart } from "@/context/SocketContext";
+import Stripe from "./Stripe";
 
 function Cart() {
   const { res } = useSocketForCart();
@@ -345,7 +346,7 @@ function Cart() {
                     {/* Action Buttons */}
                     <div className="space-y-3">
                       <button className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 px-6 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
-                        Proceed to Checkout
+                        <Stripe />
                       </button>
 
                       <button className="w-full border-2 border-gray-200 text-gray-700 py-3 px-6 rounded-xl hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 font-medium">
