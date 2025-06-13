@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const baseurl = import.meta.env.VITE_BASE_URL;
 
@@ -14,6 +14,7 @@ type CartItem = {
 
 type StripeProps = {
   data: CartItem[];
+  cartId: string;
 };
 type StripeRes = {
   status: string;
@@ -21,7 +22,7 @@ type StripeRes = {
 };
 
 export const useStripeForPayment = () => {
-  const payment = async ({ data }: StripeProps): Promise<StripeRes> => {
+  const payment = async ({ data, cartId }: StripeProps): Promise<StripeRes> => {
     const response = await fetch(
       `${baseurl}/payment/v1/create-payment-intent`,
       {
@@ -30,7 +31,7 @@ export const useStripeForPayment = () => {
         headers: {
           "Content-type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ data, cartId }),
       }
     );
 
@@ -52,6 +53,43 @@ export const useStripeForPayment = () => {
     mutationFn: payment,
     onSuccess: (data) => {
       window.location.href = data.url;
+    },
+  });
+
+  return mutation;
+};
+
+export const useSessionIdAfterSuccessPayment = () => {
+  const queryClient = useQueryClient();
+  const sessionIdAfterSuccessPayment = async (sessionId: string) => {
+    const response = await fetch(`${baseurl}/payment/v1/success-payment`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify({ sessionId }),
+    });
+
+    const res = await response.json();
+
+    if (!response.ok) {
+      const err: ErrorRes = {
+        message: res.message,
+        status: res.status,
+      };
+
+      throw err;
+    }
+
+    return res;
+  };
+
+  const mutation = useMutation({
+    mutationKey: ["sessionIdAfterSuccessPayment"],
+    mutationFn: sessionIdAfterSuccessPayment,
+    onSuccess() {
+      queryClient.invalidateQueries({ queryKey: ["getUserCart"] });
     },
   });
 

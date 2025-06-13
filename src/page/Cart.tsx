@@ -15,8 +15,6 @@ import Stripe from "./Stripe";
 function Cart() {
   const { res } = useSocketForCart();
 
-  console.log(res);
-
   const { decrementInCart, incrementInCart } = useSocketForCart();
 
   const removeItem = (productId: string) => {
@@ -347,9 +345,7 @@ function Cart() {
 
                     {/* Action Buttons */}
                     <div className="space-y-3">
-                      <button className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 px-6 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
-                        <Stripe data={cart.items} />
-                      </button>
+                      <Stripe data={cart.items} cartId={res.cart._id} />
 
                       <button className="w-full border-2 border-gray-200 text-gray-700 py-3 px-6 rounded-xl hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 font-medium">
                         Continue Shopping

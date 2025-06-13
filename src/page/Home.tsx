@@ -1,10 +1,24 @@
 import { useGetAllProducts } from "@/api/product";
+import { useSessionIdAfterSuccessPayment } from "@/api/stripe";
 import EcommerceNavbar from "@/components/Nav2";
 import ProductCard from "@/components/ProductCard";
+import { useEffect } from "react";
 
 // Enhanced Home Component
 function Home() {
   const { data } = useGetAllProducts();
+  const { mutate } = useSessionIdAfterSuccessPayment();
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const sessionId = params.get("session_id");
+
+    if (sessionId) {
+      mutate(sessionId);
+    } else {
+      return;
+    }
+  }, [mutate]);
 
   if (!data) {
     return <div>Something wrnt wrong</div>;
@@ -12,7 +26,7 @@ function Home() {
 
   return (
     <>
-    <EcommerceNavbar />
+      <EcommerceNavbar />
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-indigo-50">
         <div className="relative overflow-hidden bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white">
           <div className="absolute inset-0 bg-black/20" />

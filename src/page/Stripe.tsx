@@ -4,21 +4,30 @@ type CartItem = {
   productId: string;
   quantity: number;
   price: number;
-  addedAt: string; // ISO string
+  addedAt: string;
 };
 
 type Props = {
   data: CartItem[];
+  cartId: string;
 };
 
-function Stripe({ data }: Props) {
-  const { mutate } = useStripeForPayment();
+function Stripe({ data, cartId }: Props) {
+  const { mutate, isPending } = useStripeForPayment();
   const buyFunction = () => {
-    console.log(data);
-    mutate({ data });
+    console.log(cartId);
+    mutate({ data, cartId });
   };
 
-  return <div onClick={buyFunction}>Submit</div>;
+  return (
+    <button
+      onClick={buyFunction}
+      disabled={isPending}
+      className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 px-6 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+    >
+      <div>Submit</div>
+    </button>
+  );
 }
 
 export default Stripe;
