@@ -154,3 +154,38 @@ export const useGetCurrentUser = () => {
 
   return query;
 };
+
+export const useUpdateUserInfo = () => {
+  const getCurrentUserInfo = async (data: {
+    name: string;
+    email: string;
+  }): Promise<VerifiedUserResponse> => {
+    const response = await fetch(`${baseurl}/auth/v1/update-current-user`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify({ data }),
+    });
+
+    const res = await response.json();
+
+    if (!response.ok) {
+      const err: ErrorRes = {
+        message: res.message,
+        status: res.status,
+      };
+      throw err;
+    }
+    console.log(res.message);
+    return res;
+  };
+
+  const mutate = useMutation({
+    mutationKey: ["getCurrentUserInfo"],
+    mutationFn: getCurrentUserInfo,
+  });
+
+  return mutate;
+};

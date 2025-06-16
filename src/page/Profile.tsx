@@ -19,8 +19,7 @@ function Profile() {
   });
 
   const handleInfoSubmit = () => {
-    // Handle user info update
-    console.log("Updating user info:", userInfo);
+    
     setIsEditingInfo(false);
   };
 
@@ -35,7 +34,7 @@ function Profile() {
     setIsEditingPassword(false);
   };
 
-  const formatDate = (dateString) => {
+  const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
