@@ -1,4 +1,8 @@
-import { useGetCurrentUser } from "@/api/user";
+import {
+  useGetCurrentUser,
+  useUpdateUserInfo,
+  useUpdateUserPassword,
+} from "@/api/user";
 import { useState } from "react";
 import { User, Calendar, Package, Edit3, Lock, Save, X } from "lucide-react";
 
@@ -10,6 +14,7 @@ function Profile() {
   const [userInfo, setUserInfo] = useState({
     name: data?.user?.name || "",
     email: data?.user?.email || "",
+    password: "",
   });
 
   const [passwordData, setPasswordData] = useState({
@@ -18,18 +23,29 @@ function Profile() {
     confirmPassword: "",
   });
 
+  const { mutate } = useUpdateUserInfo();
+  const { mutate: updatePasswordMutate } = useUpdateUserPassword();
+
   const handleInfoSubmit = () => {
-    
     setIsEditingInfo(false);
+    mutate({
+      email: userInfo.email,
+      name: userInfo.name,
+      password: userInfo.password,
+    });
   };
 
   const handlePasswordSubmit = () => {
-    // Handle password update
     console.log("Updating password");
     setPasswordData({
       currentPassword: "",
       newPassword: "",
       confirmPassword: "",
+    });
+    updatePasswordMutate({
+      confirmNewPassword: passwordData.confirmPassword,
+      currentPassword: passwordData.currentPassword,
+      newPassword: passwordData.newPassword,
     });
     setIsEditingPassword(false);
   };
@@ -180,6 +196,7 @@ function Profile() {
                           setUserInfo({
                             name: data.user.name,
                             email: data.user.email,
+                            password: "",
                           });
                         }}
                         className="flex items-center px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"

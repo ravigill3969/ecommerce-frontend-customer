@@ -159,14 +159,15 @@ export const useUpdateUserInfo = () => {
   const getCurrentUserInfo = async (data: {
     name: string;
     email: string;
+    password: string;
   }): Promise<VerifiedUserResponse> => {
     const response = await fetch(`${baseurl}/auth/v1/update-current-user`, {
-      method: "POST",
+      method: "PUT",
       credentials: "include",
       headers: {
         "Content-type": "application/json",
       },
-      body: JSON.stringify({ data }),
+      body: JSON.stringify(data),
     });
 
     const res = await response.json();
@@ -185,6 +186,57 @@ export const useUpdateUserInfo = () => {
   const mutate = useMutation({
     mutationKey: ["getCurrentUserInfo"],
     mutationFn: getCurrentUserInfo,
+    onSuccess(data) {
+      toast.success(data.message);
+    },
+    onError(error) {
+      toast.error(error.message);
+    },
+  });
+
+  return mutate;
+};
+
+export const useUpdateUserPassword = () => {
+  const updateUserPassword = async (data: {
+    currentPassword: string;
+    newPassword: string;
+    confirmNewPassword: string;
+  }): Promise<VerifiedUserResponse> => {
+    const response = await fetch(
+      `${baseurl}/auth/v1/update-current-user-password`,
+      {
+        method: "PUT",
+        credentials: "include",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify(data),
+      }
+    );
+
+    const res = await response.json();
+
+    if (!response.ok) {
+      const err: ErrorRes = {
+        message: res.message,
+        status: res.status,
+      };
+      throw err;
+    }
+
+    return res;
+  };
+
+  const mutate = useMutation({
+    mutationKey: ["updateUserPassword"],
+    mutationFn: updateUserPassword,
+    onSuccess(data) {
+      toast.success(data.message);
+    },
+    onError(error) {
+      toast.error(error.message);
+    },
   });
 
   return mutate;
