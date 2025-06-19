@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import { refreshToken } from "@/api/user";
 
 const baseurl = import.meta.env.VITE_BASE_URL;
 
@@ -15,13 +16,18 @@ type UserContextT = {
   isAuthenticated: boolean;
 };
 
+type ErrorRes = {
+  status: string;
+  message: string;
+};
+
 const UserContext = createContext<UserContextT | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [userId, setUserId] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
-  const { isError, isSuccess, isLoading, data, error } =
+  const { isError, isSuccess, isLoading, data, error, status } =
     useQuery<VerifyUserResponse>({
       queryKey: ["verifyUser"],
       queryFn: async (): Promise<VerifyUserResponse> => {
@@ -36,7 +42,12 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         const res = await response.json();
 
         if (!response.ok) {
-          throw new Error(res.message || "Authentication failed");
+          const err: ErrorRes = {
+            message: res.message,
+            status: res.status,
+          };
+
+          throw err;
         }
 
         return res;
@@ -54,14 +65,18 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   }, [isSuccess, data]);
 
   useEffect(() => {
-    if (isError) {
+    if (status === String(401)) {
+      refreshToken();
+    } else if (isError) {
       setUserId(null);
+      refreshToken();
+
       setIsAuthenticated(false);
       const errorMessage =
         error instanceof Error ? error.message : "Please login";
       toast.error(errorMessage);
     }
-  }, [isError, error]);
+  }, [isError, error, status]);
 
   return (
     <UserContext.Provider value={{ isAuthenticated, isLoading, userId }}>

@@ -241,3 +241,22 @@ export const useUpdateUserPassword = () => {
 
   return mutate;
 };
+
+export const refreshToken = async () => {
+  const response = await fetch(`${baseurl}/auth/v1/refresh-token`, {
+    credentials: "include",
+  });
+
+  const res = await response.json();
+
+  if (!response.ok) {
+    const err: ErrorRes = {
+      message: res.message,
+      status: res.status,
+    };
+
+    throw err;
+  }
+
+  return res;
+};
