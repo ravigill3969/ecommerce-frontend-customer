@@ -131,3 +131,36 @@ export const useGetUserCart = () => {
   });
   return query;
 };
+
+type ErrorRes = {
+  status: string;
+  message: string;
+};
+export const useGetAlreadyPaidOrderOrCart = () => {
+  const getOrders = async () => {
+    const response = await fetch(`${baseurl}/cart/v1/get-paid-orders`, {
+      method: "GET",
+      credentials: "include",
+    });
+
+    const res = await response.json();
+
+    if (!response.ok) {
+      const err: ErrorRes = {
+        message: res.message || "something went wrong",
+        status: res.status || "error",
+      };
+
+      throw err;
+    }
+
+    return res;
+  };
+
+  const query = useQuery({
+    queryKey: ["getOrders"],
+    queryFn: getOrders,
+  });
+
+  return query;
+};
