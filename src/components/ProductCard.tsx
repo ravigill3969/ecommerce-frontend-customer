@@ -1,6 +1,6 @@
-import { useState } from "react";
 import { Heart, ShoppingCart, Star, Eye, ArrowRight } from "lucide-react";
 import { useAddItemToCartOrCreateCart } from "@/api/cart";
+import { useAddProductToWishList } from "@/api/product";
 
 interface Product {
   _id: string;
@@ -18,21 +18,13 @@ interface Product {
   __v: number;
 }
 
+const isLiked = false
+
 // Enhanced ProductCard Component
 export default function ProductCard({ products }: { products: Product[] }) {
-  const [likedProducts, setLikedProducts] = useState<Set<string>>(new Set());
-
   const { mutate } = useAddItemToCartOrCreateCart();
 
-  const toggleLike = (productId: string) => {
-    const newLiked = new Set(likedProducts);
-    if (newLiked.has(productId)) {
-      newLiked.delete(productId);
-    } else {
-      newLiked.add(productId);
-    }
-    setLikedProducts(newLiked);
-  };
+  const { mutate: addToWLMutate } = useAddProductToWishList();
 
   const getStockStatus = (quantity: number) => {
     if (quantity === 0)
@@ -53,7 +45,7 @@ export default function ProductCard({ products }: { products: Product[] }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 p-8">
       {products.map((product) => {
-        const isLiked = likedProducts.has(product._id);
+        // const isLiked = likedProducts.has(product._id);
         const stockStatus = getStockStatus(product.stockQuantity);
 
         return (
@@ -75,7 +67,7 @@ export default function ProductCard({ products }: { products: Product[] }) {
                 {/* Floating Action Buttons */}
                 <div className="absolute top-4 right-4 flex flex-col gap-2">
                   <button
-                    onClick={() => toggleLike(product._id)}
+                    onClick={() => addToWLMutate({ productId: product._id })}
                     className={`p-3 rounded-full backdrop-blur-md transition-all duration-300 ${
                       isLiked
                         ? "bg-red-500 text-white scale-110"

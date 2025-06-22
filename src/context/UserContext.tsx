@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import toast from "react-hot-toast";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { refreshToken } from "@/api/user";
 
 const baseurl = import.meta.env.VITE_BASE_URL;
@@ -26,36 +25,41 @@ const UserContext = createContext<UserContextT | undefined>(undefined);
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [userId, setUserId] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const queryClient = useQueryClient();
 
-  const { isError, isSuccess, isLoading, data, error, status } =
-    useQuery<VerifyUserResponse>({
-      queryKey: ["verifyUser"],
-      queryFn: async (): Promise<VerifyUserResponse> => {
-        const response = await fetch(`${baseurl}/auth/v1/verify-user`, {
-          method: "GET",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+  const { isError, isSuccess, isLoading, data } = useQuery<VerifyUserResponse>({
+    queryKey: ["verifyUser"],
+    queryFn: async (): Promise<VerifyUserResponse> => {
+      const response = await fetch(`${baseurl}/auth/v1/verify-user`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-        const res = await response.json();
+      const res = await response.json();
 
-        if (!response.ok) {
-          const err: ErrorRes = {
-            message: res.message,
-            status: res.status,
-          };
-
-          throw err;
+      if (!response.ok) {
+        if (response.status === 401) {
+          refreshToken().then(() => {
+            queryClient.invalidateQueries({ queryKey: ["verifyUser"] });
+          });
         }
+        const err: ErrorRes = {
+          message: res.message,
+          status: res.status,
+        };
 
-        return res;
-      },
-      retry: false,
-      refetchOnWindowFocus: false,
-      staleTime: 5 * 60 * 1000,
-    });
+        throw err;
+      }
+
+      return res;
+    },
+    retry: false,
+    refetchOnWindowFocus: false,
+    staleTime: 5 * 60 * 1000,
+  });
 
   useEffect(() => {
     if (isSuccess && data?.userId) {
@@ -65,18 +69,11 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   }, [isSuccess, data]);
 
   useEffect(() => {
-    if (status === String(401)) {
-      refreshToken();
-    } else if (isError) {
+    if (isError) {
       setUserId(null);
-      refreshToken();
-
       setIsAuthenticated(false);
-      const errorMessage =
-        error instanceof Error ? error.message : "Please login";
-      toast.error(errorMessage);
     }
-  }, [isError, error, status]);
+  }, [isError]);
 
   return (
     <UserContext.Provider value={{ isAuthenticated, isLoading, userId }}>
