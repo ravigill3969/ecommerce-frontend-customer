@@ -31,14 +31,21 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useUser } from "@/context/UserContext";
+import { useLogout } from "@/api/user";
 
 export default function EcommerceNavbar() {
   const { isAuthenticated } = useUser();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+
+  const { mutate, isPending } = useLogout();
+
   const navigate = useNavigate();
 
-  // Add scroll effect
+  const logout = () => {
+    mutate();
+  };
+
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 20) {
@@ -461,7 +468,8 @@ export default function EcommerceNavbar() {
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
-                    // onClick={toggleLoginStatus}
+                    onClick={logout}
+                    disabled={isPending}
                     className="flex items-center cursor-pointer text-rose-500 focus:text-rose-500"
                   >
                     <LogOut className="mr-2 h-4 w-4" />

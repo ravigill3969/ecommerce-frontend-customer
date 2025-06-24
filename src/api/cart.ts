@@ -136,8 +136,32 @@ type ErrorRes = {
   status: string;
   message: string;
 };
+
+interface Item {
+  _id: string;
+  productId: string;
+  quantity: number;
+  price: number;
+  // add more fields as needed based on your data structure
+}
+
+interface Cart {
+  _id: string;
+  userId: string;
+  status: string;
+  items: Item[];
+  createdAt: string;
+  updatedAt?: string;
+}
+
+interface OrdersResponse {
+  status: string;
+  message: string;
+  carts: Cart[];
+}
+
 export const useGetAlreadyPaidOrderOrCart = () => {
-  const getOrders = async () => {
+  const getOrders = async (): Promise<OrdersResponse> => {
     const response = await fetch(`${baseurl}/cart/v1/get-paid-orders`, {
       method: "GET",
       credentials: "include",

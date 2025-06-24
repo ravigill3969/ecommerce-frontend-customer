@@ -1,4 +1,3 @@
-import { useGetAlreadyPaidOrderOrCart } from "@/api/cart";
 import { useGetAllProducts } from "@/api/product";
 import { useSessionIdAfterSuccessPayment } from "@/api/stripe";
 import EcommerceNavbar from "@/components/Nav2";
@@ -10,9 +9,7 @@ function Home() {
   const { data } = useGetAllProducts();
   const { mutate } = useSessionIdAfterSuccessPayment();
 
-  const { data: i } = useGetAlreadyPaidOrderOrCart();
 
-  console.log(i);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);

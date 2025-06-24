@@ -8,6 +8,7 @@ import Profile from "./page/Profile";
 import Success from "./page/Success";
 import Search from "./page/Search";
 import Wishlist from "./page/Wishlist";
+import PaidOrders from "./page/PaidOrders";
 
 function App() {
   const { isAuthenticated } = useUser();
@@ -33,6 +34,10 @@ function App() {
       <Route
         path="/wishlist"
         element={isAuthenticated ? <Wishlist /> : <Login />}
+      />
+      <Route
+        path="/orders"
+        element={isAuthenticated ? <PaidOrders /> : <Login />}
       />
     </Routes>
   );

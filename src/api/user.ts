@@ -260,3 +260,41 @@ export const refreshToken = async () => {
 
   return res;
 };
+
+type LogoutResT = {
+  status: string;
+  message: "string";
+};
+
+export const useLogout = () => {
+  const queryClient = useQueryClient();
+  const logout = async (): Promise<LogoutResT> => {
+    const response = await fetch(`${baseurl}/auth/v1/logout`, {
+      credentials: "include",
+    });
+
+    const res = await response.json();
+
+    if (!response.ok) {
+      const err: ErrorRes = {
+        message: res.message,
+        status: res.status,
+      };
+
+      throw err;
+    }
+
+    return res;
+  };
+
+  const mutate = useMutation({
+    mutationFn: logout,
+    mutationKey: ["logout"],
+    onSuccess(data) {
+      toast.success(data.message);
+      queryClient.invalidateQueries({ queryKey: ["verifyUser"] });
+    },
+  });
+
+  return mutate;
+};
