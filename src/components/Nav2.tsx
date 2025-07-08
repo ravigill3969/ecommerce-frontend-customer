@@ -25,13 +25,13 @@ import {
   Heart,
   LogOut,
   Package,
-  Settings,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useUser } from "@/context/UserContext";
 import { useLogout } from "@/api/user";
+import { useSocketForCart } from "@/context/SocketContext";
 
 export default function EcommerceNavbar() {
   const { isAuthenticated } = useUser();
@@ -62,6 +62,8 @@ export default function EcommerceNavbar() {
   const handleSearch = () => {
     navigate("/search");
   };
+
+  const { totalItemsInCart } = useSocketForCart();
 
   return (
     <header
@@ -131,12 +133,12 @@ export default function EcommerceNavbar() {
                   >
                     New Arrivals
                   </Link>
-                  <Link
+                  {/* <Link
                     to="/sale"
                     className="text-slate-700 hover:text-emerald-600 font-medium px-3 py-2 rounded-md hover:bg-slate-50 transition-all"
                   >
                     Sale
-                  </Link>
+                  </Link> */}
                   <Link
                     to="/about"
                     className="text-slate-700 hover:text-emerald-600 font-medium px-3 py-2 rounded-md hover:bg-slate-50 transition-all"
@@ -313,12 +315,12 @@ export default function EcommerceNavbar() {
               </NavigationMenuItem>
 
               <NavigationMenuItem>
-                <Link
+                {/* <Link
                   to="/sale"
                   className="group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-slate-700 hover:text-emerald-600 transition-colors"
                 >
                   Sale
-                </Link>
+                </Link> */}
               </NavigationMenuItem>
 
               <NavigationMenuItem>
@@ -383,9 +385,9 @@ export default function EcommerceNavbar() {
               className="relative inline-flex items-center justify-center rounded-full w-10 h-10 hover:bg-slate-100 transition-colors"
             >
               <Heart className="h-5 w-5 text-slate-700" />
-              <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-rose-500">
-                2
-              </Badge>
+              {/* <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-rose-500">
+                
+              </Badge> */}
             </Link>
 
             <Link
@@ -394,7 +396,7 @@ export default function EcommerceNavbar() {
             >
               <ShoppingCart className="h-5 w-5 text-slate-700" />
               <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-gradient-to-r from-emerald-500 to-teal-600">
-                3
+                {totalItemsInCart}
               </Badge>
             </Link>
 
@@ -457,7 +459,7 @@ export default function EcommerceNavbar() {
                       <span>Wishlist</span>
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
+                  {/* <DropdownMenuItem asChild>
                     <Link
                       to="/settings"
                       className="flex items-center cursor-pointer"
@@ -465,7 +467,7 @@ export default function EcommerceNavbar() {
                       <Settings className="mr-2 h-4 w-4" />
                       <span>Settings</span>
                     </Link>
-                  </DropdownMenuItem>
+                  </DropdownMenuItem> */}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     onClick={logout}

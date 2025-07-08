@@ -18,6 +18,7 @@ type SocketContextT = {
   incrementInCart: (productId: string) => void;
   decrementInCart: (productId: string) => void;
   res: GetCartAPIResponse | null;
+  totalItemsInCart: number | undefined;
 };
 
 const SocketContext = createContext<SocketContextT | undefined>(undefined);
@@ -83,6 +84,8 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
 
   const { data } = useGetUserCart();
 
+  const totalItemsInCart = data?.cart.items.length;
+
   useEffect(() => {
     if (data) {
       setRes(data);
@@ -138,7 +141,9 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <SocketContext.Provider value={{ incrementInCart, decrementInCart, res }}>
+    <SocketContext.Provider
+      value={{ incrementInCart, decrementInCart, res, totalItemsInCart }}
+    >
       {children}
     </SocketContext.Provider>
   );

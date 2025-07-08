@@ -258,3 +258,59 @@ export const useSearchProducts = (params: ProductQueryParams) => {
 
   return query;
 };
+
+// Represents a single product item
+export interface Product {
+  _id: string;
+  productName: string;
+  sellerID: string;
+  price: number;
+  stockQuantity: number;
+  category: string;
+  brand: string;
+  description: string;
+  photoURLs: string[];
+  isActive: boolean;
+  createdAt: string; // or Date if you want to parse it
+  updatedAt: string;
+  __v: number;
+  stripeProductId: string | null;
+}
+
+export interface ProductData {
+  products: Product[];
+}
+
+export interface GetLatestProductsResponse {
+  status: string;
+  results: number;
+  data: ProductData;
+}
+
+export const useGetLatestProducts = () => {
+  const getLatestProducts = async (): Promise<GetLatestProductsResponse> => {
+    const response = await fetch(`${baseurl}/product/v1/recent-add-products`, {
+      credentials: "include",
+    });
+
+    const res = await response.json();
+
+    if (!response.ok) {
+      const err: ErrorRes = {
+        message: res.message,
+        status: res.status,
+      };
+
+      throw err;
+    }
+
+    return res;
+  };
+
+  const query = useQuery({
+    queryKey: ["GetLatestProducts"],
+    queryFn: getLatestProducts,
+  });
+
+  return query;
+};
