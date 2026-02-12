@@ -2,9 +2,17 @@ import React, { useEffect, useState } from "react";
 import { Search, Grid, List, ShoppingCart, Star } from "lucide-react";
 import { useSearchProducts, type Product } from "@/api/product";
 import EcommerceNavbar from "@/components/Nav2";
+import { useAddItemToCartOrCreateCart } from "@/api/cart";
 
 const ProductSearchUI = () => {
   const [products, setProducts] = useState<Product[] | []>([]);
+
+  const { mutate } = useAddItemToCartOrCreateCart();
+
+  const addToCart = (productID: string, productPrice: number) => {
+    mutate({ price: productPrice, productId: productID });
+  };
+
   const [searchParams, setSearchParams] = useState({
     q: "",
     category: "",
@@ -15,8 +23,6 @@ const ProductSearchUI = () => {
     page: 1,
     limit: 12,
   });
-
-  console.log(searchParams);
 
   const { data, isPending, error } = useSearchProducts({
     category: searchParams.category,
@@ -336,7 +342,12 @@ const ProductSearchUI = () => {
                           <span className="text-lg font-bold text-gray-900">
                             ${product.price}
                           </span>
-                          <button className="bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 transition-colors flex items-center gap-1">
+                          <button
+                            onClick={() =>
+                              addToCart(product._id, product.price)
+                            }
+                            className="bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 transition-colors flex items-center gap-1"
+                          >
                             <ShoppingCart className="h-4 w-4" />
                             Add to Cart
                           </button>

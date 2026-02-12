@@ -4,8 +4,11 @@ import {
   useUpdateUserPassword,
 } from "@/api/user";
 import { useState } from "react";
-import { User, Calendar, Package, Edit3, Lock, Save, X } from "lucide-react";
+import { User, Calendar, Package, Lock, Check, X } from "lucide-react";
 import EcommerceNavbar from "@/components/Nav2";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 function Profile() {
   const { data } = useGetCurrentUser();
@@ -28,25 +31,24 @@ function Profile() {
   const { mutate: updatePasswordMutate } = useUpdateUserPassword();
 
   const handleInfoSubmit = () => {
-    setIsEditingInfo(false);
     mutate({
       email: userInfo.email,
       name: userInfo.name,
       password: userInfo.password,
     });
+    setIsEditingInfo(false);
   };
 
   const handlePasswordSubmit = () => {
-    console.log("Updating password");
-    setPasswordData({
-      currentPassword: "",
-      newPassword: "",
-      confirmPassword: "",
-    });
     updatePasswordMutate({
       confirmNewPassword: passwordData.confirmPassword,
       currentPassword: passwordData.currentPassword,
       newPassword: passwordData.newPassword,
+    });
+    setPasswordData({
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
     });
     setIsEditingPassword(false);
   };
@@ -61,48 +63,58 @@ function Profile() {
 
   if (!data?.user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent"></div>
       </div>
     );
   }
 
   return (
     <>
-    <EcommerceNavbar />
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-8 px-4">
-        <div className="max-w-4xl mx-auto">
+      <EcommerceNavbar />
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="container mx-auto px-4">
           {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">
-              Profile Settings
-            </h1>
-            <p className="text-gray-600">
-              Manage your account information and preferences
-            </p>
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-900">My Profile</h1>
+            <p className="text-gray-600">Manage your account settings</p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Profile Overview Card */}
+          <div className="grid gap-6 lg:grid-cols-3">
+            {/* Sidebar */}
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
-                <div className="text-center">
-                  <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-3xl font-bold mx-auto mb-4">
+              <div className="rounded-xl bg-white p-6 shadow-sm">
+                <div className="flex flex-col items-center text-center">
+                  <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-indigo-600 to-indigo-700 text-2xl font-bold text-white">
                     {data.user.name.charAt(0).toUpperCase()}
                   </div>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-1">
+
+                  <h2 className="mb-1 text-xl font-bold text-gray-900">
                     {data.user.name}
                   </h2>
-                  <p className="text-gray-500 mb-6">{data.user.email}</p>
+                  <p className="mb-6 text-sm text-gray-500 break-all">
+                    {data.user.email}
+                  </p>
 
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-center text-sm text-gray-600">
-                      <Calendar className="w-4 h-4 mr-2" />
-                      Joined {formatDate(data.user.createdAt)}
+                  <div className="w-full space-y-3">
+                    <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <Calendar className="h-4 w-4" />
+                        <span className="text-sm">Joined</span>
+                      </div>
+                      <span className="text-sm font-medium text-gray-900">
+                        {formatDate(data.user.createdAt)}
+                      </span>
                     </div>
-                    <div className="flex items-center justify-center text-sm text-gray-600">
-                      <Package className="w-4 h-4 mr-2" />
-                      {data.user.prevOrders.length} Previous Orders
+
+                    <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <Package className="h-4 w-4" />
+                        <span className="text-sm">Orders</span>
+                      </div>
+                      <span className="text-sm font-medium text-gray-900">
+                        {data.user.prevOrders.length}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -110,213 +122,207 @@ function Profile() {
             </div>
 
             {/* Main Content */}
-            <div className="lg:col-span-2 space-y-6">
-              {/* Personal Information Card */}
-              <div className="bg-white rounded-2xl shadow-xl border border-gray-100">
-                <div className="p-8">
-                  <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-xl font-semibold text-gray-900 flex items-center">
-                      <User className="w-5 h-5 mr-2 text-blue-600" />
+            <div className="space-y-6 lg:col-span-2">
+              {/* Personal Information */}
+              <div className="rounded-xl bg-white p-6 shadow-sm">
+                <div className="mb-6 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <User className="h-5 w-5 text-indigo-600" />
+                    <h3 className="text-lg font-semibold text-gray-900">
                       Personal Information
                     </h3>
-                    {!isEditingInfo && (
-                      <button
-                        onClick={() => setIsEditingInfo(true)}
-                        className="flex items-center px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                      >
-                        <Edit3 className="w-4 h-4 mr-2" />
-                        Edit
-                      </button>
-                    )}
                   </div>
-
-                  {!isEditingInfo ? (
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-500 mb-1">
-                          Full Name
-                        </label>
-                        <p className="text-gray-900 font-medium">
-                          {data.user.name}
-                        </p>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-500 mb-1">
-                          Email Address
-                        </label>
-                        <p className="text-gray-900 font-medium">
-                          {data.user.email}
-                        </p>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-500 mb-1">
-                          Last Updated
-                        </label>
-                        <p className="text-gray-900 font-medium">
-                          {formatDate(data.user.updatedAt)}
-                        </p>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Full Name
-                        </label>
-                        <input
-                          type="text"
-                          value={userInfo.name}
-                          onChange={(e) =>
-                            setUserInfo({ ...userInfo, name: e.target.value })
-                          }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Email Address
-                        </label>
-                        <input
-                          type="email"
-                          value={userInfo.email}
-                          onChange={(e) =>
-                            setUserInfo({ ...userInfo, email: e.target.value })
-                          }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                        />
-                      </div>
-                      <div className="flex gap-3 pt-2">
-                        <button
-                          onClick={handleInfoSubmit}
-                          className="flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                        >
-                          <Save className="w-4 h-4 mr-2" />
-                          Save Changes
-                        </button>
-                        <button
-                          onClick={() => {
-                            setIsEditingInfo(false);
-                            setUserInfo({
-                              name: data.user.name,
-                              email: data.user.email,
-                              password: "",
-                            });
-                          }}
-                          className="flex items-center px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
-                        >
-                          <X className="w-4 h-4 mr-2" />
-                          Cancel
-                        </button>
-                      </div>
-                    </div>
+                  {!isEditingInfo && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsEditingInfo(true)}
+                    >
+                      Edit
+                    </Button>
                   )}
                 </div>
+
+                {!isEditingInfo ? (
+                  <div className="space-y-4">
+                    <div>
+                      <Label className="text-xs text-gray-500">Full Name</Label>
+                      <p className="mt-1 font-medium text-gray-900">
+                        {data.user.name}
+                      </p>
+                    </div>
+                    <div>
+                      <Label className="text-xs text-gray-500">
+                        Email Address
+                      </Label>
+                      <p className="mt-1 font-medium text-gray-900 break-all">
+                        {data.user.email}
+                      </p>
+                    </div>
+                    <div>
+                      <Label className="text-xs text-gray-500">
+                        Last Updated
+                      </Label>
+                      <p className="mt-1 font-medium text-gray-900">
+                        {formatDate(data.user.updatedAt)}
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="name">Full Name</Label>
+                      <Input
+                        id="name"
+                        value={userInfo.name}
+                        onChange={(e) =>
+                          setUserInfo({ ...userInfo, name: e.target.value })
+                        }
+                        className="mt-1.5"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="email">Email Address</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={userInfo.email}
+                        onChange={(e) =>
+                          setUserInfo({ ...userInfo, email: e.target.value })
+                        }
+                        className="mt-1.5"
+                      />
+                    </div>
+                    <div className="flex gap-2 pt-2">
+                      <Button
+                        onClick={handleInfoSubmit}
+                        className="bg-indigo-600 hover:bg-indigo-700"
+                      >
+                        <Check className="mr-2 h-4 w-4" />
+                        Save Changes
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setIsEditingInfo(false);
+                          setUserInfo({
+                            name: data.user.name,
+                            email: data.user.email,
+                            password: "",
+                          });
+                        }}
+                      >
+                        <X className="mr-2 h-4 w-4" />
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
 
-              {/* Password Update Card */}
-              <div className="bg-white rounded-2xl shadow-xl border border-gray-100">
-                <div className="p-8">
-                  <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-xl font-semibold text-gray-900 flex items-center">
-                      <Lock className="w-5 h-5 mr-2 text-red-600" />
-                      Change Password
+              {/* Password */}
+              <div className="rounded-xl bg-white p-6 shadow-sm">
+                <div className="mb-6 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Lock className="h-5 w-5 text-indigo-600" />
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      Security
                     </h3>
-                    {!isEditingPassword && (
-                      <button
-                        onClick={() => setIsEditingPassword(true)}
-                        className="flex items-center px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                      >
-                        <Edit3 className="w-4 h-4 mr-2" />
-                        Update Password
-                      </button>
-                    )}
                   </div>
-
-                  {!isEditingPassword ? (
-                    <div className="text-gray-600">
-                      <p>
-                        Keep your account secure by using a strong password.
-                      </p>
-                      <p className="text-sm mt-2">
-                        Last updated: {formatDate(data.user.updatedAt)}
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Current Password
-                        </label>
-                        <input
-                          type="password"
-                          value={passwordData.currentPassword}
-                          onChange={(e) =>
-                            setPasswordData({
-                              ...passwordData,
-                              currentPassword: e.target.value,
-                            })
-                          }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          New Password
-                        </label>
-                        <input
-                          type="password"
-                          value={passwordData.newPassword}
-                          onChange={(e) =>
-                            setPasswordData({
-                              ...passwordData,
-                              newPassword: e.target.value,
-                            })
-                          }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Confirm New Password
-                        </label>
-                        <input
-                          type="password"
-                          value={passwordData.confirmPassword}
-                          onChange={(e) =>
-                            setPasswordData({
-                              ...passwordData,
-                              confirmPassword: e.target.value,
-                            })
-                          }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
-                        />
-                      </div>
-                      <div className="flex gap-3 pt-2">
-                        <button
-                          onClick={handlePasswordSubmit}
-                          className="flex items-center px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-                        >
-                          <Save className="w-4 h-4 mr-2" />
-                          Update Password
-                        </button>
-                        <button
-                          onClick={() => {
-                            setIsEditingPassword(false);
-                            setPasswordData({
-                              currentPassword: "",
-                              newPassword: "",
-                              confirmPassword: "",
-                            });
-                          }}
-                          className="flex items-center px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
-                        >
-                          <X className="w-4 h-4 mr-2" />
-                          Cancel
-                        </button>
-                      </div>
-                    </div>
+                  {!isEditingPassword && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsEditingPassword(true)}
+                    >
+                      Change Password
+                    </Button>
                   )}
                 </div>
+
+                {!isEditingPassword ? (
+                  <div className="text-sm text-gray-600">
+                    <p className="mb-2">
+                      Keep your account secure with a strong password.
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Last updated: {formatDate(data.user.updatedAt)}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="current-password">Current Password</Label>
+                      <Input
+                        id="current-password"
+                        type="password"
+                        value={passwordData.currentPassword}
+                        onChange={(e) =>
+                          setPasswordData({
+                            ...passwordData,
+                            currentPassword: e.target.value,
+                          })
+                        }
+                        className="mt-1.5"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="new-password">New Password</Label>
+                      <Input
+                        id="new-password"
+                        type="password"
+                        value={passwordData.newPassword}
+                        onChange={(e) =>
+                          setPasswordData({
+                            ...passwordData,
+                            newPassword: e.target.value,
+                          })
+                        }
+                        className="mt-1.5"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="confirm-password">
+                        Confirm New Password
+                      </Label>
+                      <Input
+                        id="confirm-password"
+                        type="password"
+                        value={passwordData.confirmPassword}
+                        onChange={(e) =>
+                          setPasswordData({
+                            ...passwordData,
+                            confirmPassword: e.target.value,
+                          })
+                        }
+                        className="mt-1.5"
+                      />
+                    </div>
+                    <div className="flex gap-2 pt-2">
+                      <Button
+                        onClick={handlePasswordSubmit}
+                        className="bg-indigo-600 hover:bg-indigo-700"
+                      >
+                        <Check className="mr-2 h-4 w-4" />
+                        Update Password
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setIsEditingPassword(false);
+                          setPasswordData({
+                            currentPassword: "",
+                            newPassword: "",
+                            confirmPassword: "",
+                          });
+                        }}
+                      >
+                        <X className="mr-2 h-4 w-4" />
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>

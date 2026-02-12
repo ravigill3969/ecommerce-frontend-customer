@@ -19,7 +19,7 @@ type AddItemToCartOrCreateCartErrorRes = {
 };
 
 export const useAddItemToCartOrCreateCart = () => {
-  const query = useQueryClient();
+  // const query = useQueryClient();
   const addItemToCartOrCreateCart = async (
     data: AddItemToCartOrCreateCartAsInput
   ): Promise<AddItemToCartOrCreateCartSuccessRes> => {
@@ -51,7 +51,7 @@ export const useAddItemToCartOrCreateCart = () => {
     mutationFn: addItemToCartOrCreateCart,
     onSuccess(data) {
       toast.success(data.message);
-      query.invalidateQueries({ queryKey: ["getUserCart"] });
+      // query.invalidateQueries({ queryKey: ["getUserCart"] });
     },
     onError(error) {
       toast.error(error.message);
@@ -142,7 +142,7 @@ interface Item {
   productId: string;
   quantity: number;
   price: number;
-  // add more fields as needed based on your data structure
+ 
 }
 
 interface Cart {
@@ -187,4 +187,57 @@ export const useGetAlreadyPaidOrderOrCart = () => {
   });
 
   return query;
+};
+
+type RemoveItemFromCart = {
+  productID: string;
+  cartID: string;
+};
+
+type RemoveItemFromCartRes = {
+  status: string;
+  message: string;
+};
+
+export const useRemoveItemFromCart = () => {
+  const query = useQueryClient();
+  const removeItemFromCart = async (
+    data: RemoveItemFromCart
+  ): Promise<RemoveItemFromCartRes> => {
+    const response = await fetch(`${baseurl}/cart/v1/remove-item-cart`, {
+      method: "PUT",
+      credentials: "include",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    const res = await response.json();
+
+    if (!response.ok) {
+      const err: ErrorRes = {
+        status: res.status || false,
+        message: res.message || "something went wrong!",
+      };
+
+      throw err;
+    }
+
+    return res;
+  };
+
+  const mutate = useMutation({
+    mutationKey: ["removeItemFromCart"],
+    mutationFn: removeItemFromCart,
+    onSuccess(data) {
+      toast.success(data.message);
+      query.invalidateQueries({ queryKey: ["getUserCart"] });
+    },
+    onError(error) {
+      toast.error(error.message);
+    },
+  });
+
+  return mutate;
 };

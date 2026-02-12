@@ -3,7 +3,6 @@ import { CheckCircle, Download, Mail, ArrowRight, Home } from "lucide-react";
 import { useNavigate } from "react-router";
 
 function Success() {
-  // In a real app, you'd get these from URL params or API
   const orderDetails = {
     orderNumber:
       "#ORD-" + Math.random().toString(36).substr(2, 9).toUpperCase(),
