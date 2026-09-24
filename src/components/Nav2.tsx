@@ -85,12 +85,7 @@ export default function EcommerceNavbar() {
                   >
                     Home
                   </Link>
-                  <Link
-                    to="/shop"
-                    className="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 hover:text-indigo-600"
-                  >
-                    Shop
-                  </Link>
+
                   <Link
                     to="/new-arrivals"
                     className="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 hover:text-indigo-600"
@@ -153,12 +148,7 @@ export default function EcommerceNavbar() {
             >
               Home
             </Link>
-            <Link
-              to="/shop"
-              className="text-sm font-medium text-gray-700 transition-colors hover:text-indigo-600"
-            >
-              Shop
-            </Link>
+           
             <Link
               to="/new-arrivals"
               className="text-sm font-medium text-gray-700 transition-colors hover:text-indigo-600"
@@ -258,7 +248,10 @@ export default function EcommerceNavbar() {
                   </Button>
                 </Link>
                 <Link to="/register">
-                  <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700">
+                  <Button
+                    size="sm"
+                    className="bg-indigo-600 hover:bg-indigo-700"
+                  >
                     Sign Up
                   </Button>
                 </Link>

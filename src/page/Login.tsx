@@ -210,7 +210,7 @@ const Login: React.FC = () => {
             <p className="text-gray-300 text-base">
               Don't have an account?{" "}
               <a
-                href="#"
+                href="/register"
                 className="text-purple-400 hover:text-purple-300 font-semibold transition-colors hover:underline"
               >
                 Sign up

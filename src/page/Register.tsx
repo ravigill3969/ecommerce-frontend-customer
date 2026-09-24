@@ -234,9 +234,9 @@ const Login: React.FC = () => {
           {/* Footer */}
           <div className="mt-8 text-center">
             <p className="text-gray-300 text-base">
-              Don't have an account?{" "}
+              Do have an account?{" "}
               <a
-                href="#"
+                href="/login"
                 className="text-purple-400 hover:text-purple-300 font-semibold transition-colors hover:underline"
               >
                 Sign up

@@ -29,6 +29,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
   const [res, setRes] = useState<GetCartAPIResponse | null>(null);
 
   function increment(productId: string) {
+    console.log("called")
     setRes((prev) => {
       if (!prev) return prev;
 
