@@ -1,5 +1,4 @@
 import { useGetAlreadyPaidOrderOrCart } from "@/api/cart";
-import React from "react";
 import {
   Package,
   Calendar,
